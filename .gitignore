@@ -58,3 +58,8 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+.vsconfig
+UserSettings/EditorUserSettings.asset
+UserSettings/Search.index
+UserSettings/Search.settings
+UserSettings/Layouts/default-2021.dwlt
