@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour
 
     int choosenSeed;
     Transform road;
+    AudioSource source;
+    AudioClip clip;
 
     private void Awake()
     {
@@ -38,6 +40,12 @@ public class GameManager : MonoBehaviour
         instance = this;
         roadAnim.speed = 0;
         road = roadAnim.transform;
+
+        source = gameObject.AddComponent<AudioSource>();
+        clip = Microphone.Start(Microphone.devices[0].ToString(), true, 1, 44100);
+        source.clip = clip;
+        source.mute = true;
+        source.loop = true;
 
         StartCoroutine(FadeIn());
 
@@ -55,14 +63,30 @@ public class GameManager : MonoBehaviour
             delta += Time.deltaTime;
         }
         fade.color = Color.clear;
-
-        while (!go)
+        float time = 0;
+        while (true)
         {
+            time += Time.deltaTime;
+
+            float[] clipdata = new float[44100];
+            clip.GetData(clipdata, source.timeSamples);
+            float maxSound = 0;
+            for (int i = 0; i < clipdata.Length; i++)
+            {
+                if (clipdata[i] > maxSound)
+                    maxSound = clipdata[i];
+            }
+
+            Debug.Log(maxSound);
+
+            if (maxSound > 0.5f)
+            {
+                break;
+            }
             yield return null;
         }
+        Microphone.End(Microphone.devices[0].ToString());
         Blow();
-
-
     }
 
 
@@ -101,6 +125,51 @@ public class GameManager : MonoBehaviour
         road.position = Vector3.zero + Vector3.forward * 20;
         yield return new WaitUntil(() => canvasAnim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
         yield return new WaitUntil(() => stoneAnim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
+
+
+
+
+
+        while (true)
+        {
+            float go = Input.acceleration.x;
+            float dtime = Time.deltaTime;
+            if (Character.position.x + go * dtime < -2)
+            {
+
+                Character.position = new Vector3(-2, Character.position.y, 0);
+            }
+            else if (Character.position.x + go * dtime > 2)
+            {
+
+                Character.position = new Vector3(2, Character.position.y, 0);
+            }
+            else
+            {
+                Character.position += Vector3.right * go * dtime;
+            }
+
+            if (Character.position.y - 0.0981f * dtime > -4f)
+            {
+                Character.position += Vector3.up * -0.0981f * dtime;
+                roadAnim.speed -= 0.0981f * dtime;
+            }
+            else
+            {
+                Character.position = new Vector3(Character.position.x, -4f, 0);
+                roadAnim.speed = 1.4f;
+                break;
+            }
+            yield return null;
+        }
+
+
+
+
+
+
+
+
     }
 
     
