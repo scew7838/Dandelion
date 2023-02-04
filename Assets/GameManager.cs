@@ -32,14 +32,16 @@ public class GameManager : MonoBehaviour
     AudioSource source;
     AudioClip clip;
     public bool gameEnd = false;
+    public bool gameEnd2 = false;
     public AnimationCurve curve;
 
     public Transform[] blocks = new Transform[6];
     public Sprite[] sprites;
     public CanvasGroup Endto;
 
-
-
+    public SpriteRenderer flower;
+    public SpriteRenderer flower2;
+    public float playtime;
     IEnumerator StartGame_Object()
     {
         while (!gameEnd)
@@ -74,8 +76,8 @@ public class GameManager : MonoBehaviour
 
                             if (Mathf.Abs(Character.position.x - vec.x) < 1)
                             {
-                                roadAnim.speed -= 0.05f;
-                                Character.position -= Vector3.up*0.05f;
+                                roadAnim.speed -= 0.03f;
+                                Character.position -= Vector3.up*0.03f;
                                 if (roadAnim.speed < 1.4f)
                                     roadAnim.speed = 1.4f;
                                 if (Character.position.y < -4f)
@@ -131,6 +133,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+
         if (instance != null)
         {
             Destroy(this);
@@ -229,7 +232,7 @@ public class GameManager : MonoBehaviour
         road.position = Vector3.zero + Vector3.forward * 20;
         yield return new WaitUntil(() => canvasAnim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
         yield return new WaitUntil(() => stoneAnim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
-        float Timer = 15f;
+        float Timer = playtime;
 
         while (true&&Timer>0)
         {
@@ -316,8 +319,24 @@ public class GameManager : MonoBehaviour
         }
 
 
+        int count = 0;
+        for (int i = 0; i < 5; i++)
+        {
+            if (PlayerPrefs.GetInt("seed" + i.ToString(), 0) != 0)
+                count++;
 
+        }
 
+        if (count == 0)
+        {
+            flower.sprite = null;
+        }
+        else
+        {
+            flower.sprite = sprites[count - 1];
+        }
+
+        gameEnd2 = true;
 
         roadAnim.Play(end);
         roadAnim.Update(0);
@@ -339,13 +358,31 @@ public class GameManager : MonoBehaviour
 
 
 
-        int count = 0;
+        count = 0;
         for (int i = 0; i < 5; i++)
         {
-            if(PlayerPrefs.GetInt("seed" + i.ToString(), 0)!=0)
+            if (PlayerPrefs.GetInt("seed" + i.ToString(), 0) != 0)
                 count++;
+
+        }
+        flower2.sprite = sprites[count - 1];
+
+        delta = 0;
+        while (delta < 1)
+        {
+
+            flower.color = new Color(1, 1, 1, 1 - delta);
+            flower2.color = new Color(1, 1, 1, delta);
+
+            yield return null;
+            delta += Time.deltaTime;
         
         }
+        flower.color = new Color(1, 1, 1, 0);
+        flower2.color = new Color(1, 1, 1, 1);
+
+
+
 
 
         if (count == 5)
@@ -357,7 +394,7 @@ public class GameManager : MonoBehaviour
                 
             }
             
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(2f);
             Endto.alpha = 1;
             yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
 

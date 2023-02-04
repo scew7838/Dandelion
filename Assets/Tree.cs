@@ -9,7 +9,7 @@ public class Tree : MonoBehaviour
     public float offset;
 
     float time = 0;
-    
+   
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +22,7 @@ public class Tree : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (time > 1f&&!GameManager.instance.gameEnd)
+        if (time > 1f&&!GameManager.instance.gameEnd2)
         {
             time -= 1;
             GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, time * 5f);
