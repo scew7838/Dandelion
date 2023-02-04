@@ -63,10 +63,12 @@ public class SoundManager : MonoBehaviour
     }
     public void ChangeBGMtoDone()
     {
-        music1.PlayOneShot(clips[2]);
-        music1.PlayOneShot(clips[8]);
-        music1.PlayOneShot(clips[9]);
-        music1.PlayOneShot(clips[10]);
+        //music1.PlayOneShot(clips[2]);
+        //music1.PlayOneShot(clips[8]);
+        //music1.PlayOneShot(clips[9]);
+        //music1.PlayOneShot(clips[10]);
+    
+        
     //    int position;
     //    music.getTimelinePosition(out position);
     //    music = FMODUnity.RuntimeManager.CreateInstance(sound[2]);

@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour
             delta += Time.deltaTime;
         }
         roadAnim.speed = startSpeed;
-        SoundManager.instance.StartGo();
+        //SoundManager.instance.StartGo();
         while (delta < 2)
         {
             Character.position = Vector3.up * 6 * (2.4f - 1.4f*delta);
