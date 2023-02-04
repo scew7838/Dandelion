@@ -38,8 +38,6 @@ public class GameManager : MonoBehaviour
     public Sprite[] sprites;
     public CanvasGroup Endto;
 
-    public SpriteRenderer[] flowers;
-
 
 
     IEnumerator StartGame_Object()
@@ -76,7 +74,16 @@ public class GameManager : MonoBehaviour
 
                             if (Mathf.Abs(Character.position.x - vec.x) < 1)
                             {
-                                roadAnim.speed -= 0.2f;
+                                roadAnim.speed -= 0.05f;
+                                Character.position -= Vector3.up*0.05f;
+                                if (roadAnim.speed < 1.4f)
+                                    roadAnim.speed = 1.4f;
+                                if (Character.position.y < -4f)
+                                    Character.position = Vector3.down * 4f;
+
+
+
+
                                 StartCoroutine(Red());
 
                             }
@@ -231,7 +238,7 @@ public class GameManager : MonoBehaviour
 
 
             float go = Input.acceleration.x*5;
-            go=Mathf.Clamp(go, -1f, 1f);
+            go=Mathf.Clamp(go, -2.5f, 2.5f);
 
 
             timer.text = Mathf.CeilToInt(Timer).ToString();
@@ -317,57 +324,21 @@ public class GameManager : MonoBehaviour
         yield return new WaitUntil(() => roadAnim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
 
         delta = 0;
-        Vector3 randomPos = new Vector3(Random.Range(-10f, 10f), Random.Range(5f,15f),0);
-        randomPos -= Vector3.forward * 1f / randomPos.y;
-        Character.SetParent(road.GetChild(3));
-        Character.GetComponent<Animator>().speed = 0;
-        for (int i = 0; i < 5; i++)
-        {
-            if (PlayerPrefs.GetInt("seed" + i.ToString(), 0) != 0)
-            {
-                Vector2 randomPos0;
-                randomPos0.x = PlayerPrefs.GetFloat("seedx" + i.ToString());
-                randomPos0.y = PlayerPrefs.GetFloat("seedy" + i.ToString());
-
-
-                PlayerPrefs.SetInt("seed" + i.ToString(), 1 + PlayerPrefs.GetInt("seed" + i.ToString(), 0));
-                flowers[i].transform.SetParent(road.GetChild(3));
-                flowers[i].GetComponent<SpriteRenderer>().sprite = sprites[PlayerPrefs.GetInt("seed" + i.ToString(), 0) - 1];
-                flowers[i].transform.localPosition = randomPos0;
-                flowers[i].transform.localPosition -= Vector3.forward * 1f/flowers[i].transform.localPosition.y;
-                flowers[i].transform.rotation = Quaternion.Euler(0, 0, 0);
-            }
-
-
-        }
         PlayerPrefs.SetInt("seed" + choosenSeed.ToString(), 1);
-        PlayerPrefs.SetFloat("seedx" + choosenSeed.ToString(), randomPos.x);
-        PlayerPrefs.SetFloat("seedy" + choosenSeed.ToString(), randomPos.y);
 
         while (delta < 1)
         {
-            for(int i=0;i<5;i++)
-            {
-                flowers[i].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, delta);
-            }
-            Character.localPosition = Vector3.Lerp(Character.localPosition, randomPos, delta);
-            Character.localScale = Vector3.Lerp(new Vector3(0.5f/ Character.parent.lossyScale.x, 0.5f / Character.parent.lossyScale.y, 0.5f), new Vector3(0.3f / Character.parent.lossyScale.x, 0.3f / Character.parent.lossyScale.y, 1f), delta);
-            Character.rotation = Quaternion.Euler(0, 0, 0);
+
+            Character.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1 - delta);
+
             yield return null;
             delta += Time.deltaTime;
-
+        
         }
-        for (int i = 0; i < 5; i++)
-        {
-            flowers[i].GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
-        }
+        Character.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
 
-        Character.localPosition = randomPos;
-        Character.localScale = new Vector3(0.3f / Character.parent.localScale.x, 0.15f / Character.parent.localScale.y, 0.3f);
-        Character.rotation = Quaternion.Euler(0, 0, 0);
-        Character.GetComponent<Animator>().enabled = false;
-        Character.GetComponent<SpriteRenderer>().sprite = sprites[0];
-        yield return new WaitForSeconds(1f);
+
+
         int count = 0;
         for (int i = 0; i < 5; i++)
         {
@@ -383,12 +354,9 @@ public class GameManager : MonoBehaviour
             {
                
                     PlayerPrefs.SetInt("seed" + i.ToString(), 0);
-                    if(flowers[i].GetComponent<SpriteRenderer>().sprite!=null)                
-                    flowers[i].GetComponent<SpriteRenderer>().sprite = sprites[7];
                 
             }
-            Character.GetComponent<SpriteRenderer>().sprite = sprites[7];
-
+            
             yield return new WaitForSeconds(1f);
             Endto.alpha = 1;
             yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
