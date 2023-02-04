@@ -528,7 +528,7 @@ MonoBehaviour:
   seed: {fileID: 1058641726}
   Character: {fileID: 1328477276}
   startSpeed: 3
-  go: 0
+  go: 1
 --- !u!4 &512701112
 Transform:
   m_ObjectHideFlags: 0
