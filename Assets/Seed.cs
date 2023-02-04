@@ -23,9 +23,32 @@ public class Seed : MonoBehaviour
 
         quaternions = new Quaternion[transform.childCount];
         totalRotation = new float[transform.childCount];
+
+        int count=0;
+        for (int i = 0; i < 5; i++)
+        {
+            if (PlayerPrefs.GetInt("seed" + i.ToString(), 0) != 0)
+                count++;
+
+        }
+
+
+        if (count == 5)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+
+                PlayerPrefs.SetInt("seed" + i.ToString(), 0);
+
+            }
+
+        }
+
+
+
         for (int i = 0; i < transform.childCount; i++)
         {
-            if (PlayerPrefs.GetInt("seed" + i.ToString()) == 1)
+            if (PlayerPrefs.GetInt("seed" + i.ToString(),0) != 0)
             {
                 transform.GetChild(i).GetComponent<SpriteRenderer>().color = Color.clear;
             }
