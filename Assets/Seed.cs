@@ -112,7 +112,7 @@ public class Seed : MonoBehaviour
 
     public int Blow()
     {
-
+        SoundManager.instance.Exhale();
         int rand = Random.Range(0, transform.childCount);
         int choosen = -1;
         for (int i = 0; i < transform.childCount; i++)
@@ -136,6 +136,8 @@ public class Seed : MonoBehaviour
     }
     IEnumerator StartGame(int choosen)
     {
+        
+
         Transform seed = transform.GetChild(choosen);
         Vector3 seedPos = seed.position;
         float delta = 0;

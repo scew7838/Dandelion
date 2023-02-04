@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
     public SpriteRenderer flower;
     public SpriteRenderer flower2;
     public float playtime;
+
     IEnumerator StartGame_Object()
     {
         while (!gameEnd)
@@ -74,7 +75,7 @@ public class GameManager : MonoBehaviour
                         if (first)
                         {
 
-                            if (Mathf.Abs(Character.position.x - vec.x) < 1)
+                            if (Mathf.Abs(Character.position.x - vec.x) < 0.75f)
                             {
                                 roadAnim.speed -= 0.03f;
                                 Character.position -= Vector3.up*0.03f;
@@ -133,28 +134,27 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-
-        if (instance != null)
-        {
-            Destroy(this);
-            return;
-        }
         timer.text = "";
         instance = this;
         roadAnim.speed = 0;
         road = roadAnim.transform;
 
+
         source = gameObject.AddComponent<AudioSource>();
+
         clip = Microphone.Start(Microphone.devices[0].ToString(), true, 1, 44100);
+
         source.clip = clip;
         source.mute = true;
         source.loop = true;
 
-        StartCoroutine(FadeIn());
 
+
+        StartCoroutine(FadeIn());
+        
 
     }
-
+    
     IEnumerator FadeIn()
     {
         float delta = 0;
@@ -181,7 +181,7 @@ public class GameManager : MonoBehaviour
             }
 
 
-            if (maxSound > 0.5f)
+            if (maxSound > 0.75f)
             {
                 break;
             }
@@ -216,6 +216,7 @@ public class GameManager : MonoBehaviour
             delta += Time.deltaTime;
         }
         roadAnim.speed = startSpeed;
+        SoundManager.instance.StartGo();
         while (delta < 2)
         {
             Character.position = Vector3.up * 6 * (2.4f - 1.4f*delta);
@@ -224,6 +225,7 @@ public class GameManager : MonoBehaviour
             yield return null;
             delta += Time.deltaTime;
         }
+        SoundManager.instance.Move();
 
         StartCoroutine("StartGame_Object");
 
@@ -240,9 +242,15 @@ public class GameManager : MonoBehaviour
 
 
 
-            float go = Input.acceleration.x*5;
-            go=Mathf.Clamp(go, -2.5f, 2.5f);
 
+
+
+            float go = Input.acceleration.x*9;
+            go=Mathf.Clamp(go, -3f, 3f);
+#if UNITY_EDITOR
+
+            go = Input.GetAxis("Horizontal")*3f;
+#endif
 
             timer.text = Mathf.CeilToInt(Timer).ToString();
 
@@ -277,6 +285,7 @@ public class GameManager : MonoBehaviour
             }
             yield return new WaitForFixedUpdate();
         }
+        SoundManager.instance.MoveStop();
         gameEnd = true;
 
         StopCoroutine("StartGame_Object");
@@ -286,6 +295,7 @@ public class GameManager : MonoBehaviour
 
         if (Timer > 0)
         {
+            SoundManager.instance.CantGet();
             delta = 0;
             while (delta < 1)
             {
@@ -335,9 +345,15 @@ public class GameManager : MonoBehaviour
         {
             flower.sprite = sprites[count - 1];
         }
+        if(count==4)
+        {
+            SoundManager.instance.ChangeBGMtoDone();
+        }
+
+
 
         gameEnd2 = true;
-
+        SoundManager.instance.Arrive();
         roadAnim.Play(end);
         roadAnim.Update(0);
         yield return new WaitUntil(() => roadAnim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
@@ -411,6 +427,7 @@ public class GameManager : MonoBehaviour
         }
         fade.color = Color.white;
 
+        SoundManager.instance.ChangeBGMtoOriginal();
         SceneManager.LoadScene(0);
 
 
